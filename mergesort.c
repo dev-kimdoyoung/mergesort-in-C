@@ -1,26 +1,33 @@
 #include <stdio.h>
-#include "boolean.h"
 
+#define MAXARRAYSIZE 8      // 배열의 최대 크기
 /**
- *  Function Prototype
- */
+*  Function Prototype
+*/
 void mergeSort(const int arraySize, int originalArray[]);
-void merge(int leftArraySize, int rightArraySize, const int leftArray[], const int RightArray[], int originalArray[]);       
+void merge(int leftArraySize, int rightArraySize, const int leftArray[], const int rightArray[], int originalArray[]);       
 
 int main() {
-    int originalArray[8] = {27, 10, 12, 20, 25, 13, 15, 22};
-    const int originalArraySize = sizeof(originalArray) / sizeof(int);
-    mergeSort(originalArraySize, originalArray);
+    int originalArray[MAXARRAYSIZE] = {27, 10, 12, 20, 25, 13, 15, 22};
+    int originalSize = sizeof(originalArray) / sizeof(int);     // 배열의 크기
 
-    for(int i = 0; i < originalArraySize; i++) {
+    printf("정렬 전 : ");
+
+    for(int i = 0; i < originalSize; i++) {
         printf("%d ", originalArray[i]);
     }
     printf("\n");
+    mergeSort(originalSize, originalArray);
 
+    printf("정렬 후 : ");
+    for(int i = 0; i < originalSize; i++) {
+        printf("%d ", originalArray[i]);
+    }
+    printf("\n");
+    printf("정렬 완료!!\n");
     return 0;
 }
-
-void mergeSort(const int arraySize, int array[]) {
+void mergeSort(const int arraySize, int originalArray[]) {
     if(arraySize > 1) {
         int leftArraySize = arraySize / 2;
         int rightArraySize = arraySize - leftArraySize;
@@ -28,56 +35,51 @@ void mergeSort(const int arraySize, int array[]) {
         int leftArray[leftArraySize];
         int rightArray[rightArraySize];
 
-        int index;
-        // left Array 요소 copy
-        for(index = 0; index < leftArraySize; index++) {
-            leftArray[index] = array[index];
+        // original 배열을 절반으로 나누어 왼쪽, 오른쪽 배열로 따로 저장하기
+
+        for(int i = 0; i < leftArraySize; i++) {
+            leftArray[i] = originalArray[i];
         }
 
-        // right Array 요소 copy
-        for(index = 0; index < rightArraySize; index++) {
-            int originalArrayIndex = rightArraySize + index;
-            rightArray[index] = array[originalArrayIndex];
+        for(int i = 0; i < rightArraySize; i++) {
+            int temp = rightArraySize + i;
+            rightArray[i] = originalArray[temp];
         }
-
         mergeSort(leftArraySize, leftArray);
         mergeSort(rightArraySize, rightArray);
-        merge(leftArraySize, rightArraySize, leftArray, rightArray, array);
+        merge(leftArraySize, rightArraySize, leftArray, rightArray, originalArray);
     }
 }
 
 void merge(int leftArraySize, int rightArraySize, const int leftArray[], const int rightArray[], int originalArray[]) {
-    int i = 0;
-    int j = 0;
-    int k = 0;
+    int leftIterator = 0;
+    int rightIterator = 0;
+    int original = 0;
 
-    // 왼쪽 또는 오른쪽 배열의 비교가 끝나기 전까지
-    while((i != leftArraySize) && (j != rightArraySize)) {
-        // 오른쪽 배열 값이 왼쪽 배열 값보다 크면 왼쪽 배열 값을 original Array에 대입
-        if(leftArray[i] < rightArray[j]) {
-            originalArray[k] = leftArray[i];
-            i++;
+    while(leftIterator != leftArraySize && rightIterator != rightArraySize) {
+        // rightArray가 leftArray보다 크면 leftArray 요소를 original에 insert
+        if(leftArray[leftIterator] < rightArray[rightIterator]) {
+            originalArray[original] = leftArray[leftIterator];
+            leftIterator++;
+            original++;
         }
+        // leftArray가 rightArray보다 크면 rightArray 요소를 original에 insert
         else {
-            originalArray[k] = rightArray[j];
-            j++;
-        }
-        k++;
-    }
-    // 오른쪽에 정렬이 되지 않은 요소 모두 originalArray에 복사 
-    if(i == leftArraySize) {
-        while(j != rightArraySize) {
-            originalArray[k] = rightArray[j];
-            j++;
-            k++;
+            originalArray[original] = rightArray[rightIterator];
+            rightIterator++;
+            original++;
         }
     }
-    // 왼쪽에 정렬이 되지 않은 요소 모두 originalArray에 복사
-    else {
-        while(i != leftArraySize) {
-            originalArray[k] = leftArray[i];
-            i++;
-            k++;
-        }
+
+    while(leftIterator != leftArraySize) {
+    originalArray[original] = leftArray[leftIterator];
+    leftIterator++;
+    original++;
+    }
+
+    while(rightIterator != rightArraySize) {
+        originalArray[original] = rightArray[rightIterator];
+        rightIterator++;
+        original++;
     }
 }
